@@ -36,6 +36,6 @@ COPY --from=builder /siwe-oidc/siwe-oidc.toml ./
 ENV SIWEOIDC_ADDRESS="0.0.0.0"
 EXPOSE 8000
 ENTRYPOINT ["siwe-oidc"]
-LABEL org.opencontainers.image.source https://github.com/spruceid/siwe-oidc
+LABEL org.opencontainers.image.source https://github.com/signinwithethereum/siwe-oidc
 LABEL org.opencontainers.image.description "OpenID Connect Identity Provider for Sign-In with Ethereum"
 LABEL org.opencontainers.image.licenses "MIT OR Apache-2.0"
