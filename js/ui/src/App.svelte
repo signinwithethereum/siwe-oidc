@@ -108,16 +108,15 @@
 
 <div
 	class="bg-no-repeat bg-cover bg-center bg-swe-landing font-satoshi bg-gray flex-grow w-full h-screen items-center flex justify-center flex-wrap flex-col"
-	style="background-image: url('img/swe-landing.svg');"
 >
 	<div class="w-96 text-center bg-white rounded-20 text-grey flex h-100 flex-col p-12 shadow-lg shadow-white">
 		{#if client_metadata.logo_uri}
 			<div class="flex justify-evenly items-stretch">
-				<img height="72" width="72" class="self-center mb-8" src="img/modal_icon.png" alt="Ethereum logo" />
+				<img height="72" width="72" class="self-center mb-8" src="img/siwe.svg" alt="SIWE logo" />
 				<img height="72" width="72" class="self-center mb-8" src={client_metadata.logo_uri} alt="Client logo" />
 			</div>
 		{:else}
-			<img height="72" width="72" class="self-center mb-8" src="img/modal_icon.png" alt="Ethereum logo" />
+			<img height="72" width="72" class="self-center mb-8" src="img/siwe.svg" alt="SIWE logo" />
 		{/if}
 		<h5>Welcome</h5>
 		<span class="text-xs">
