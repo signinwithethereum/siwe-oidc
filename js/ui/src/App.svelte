@@ -133,7 +133,7 @@
 				<path d="M0.0518397 10.7353L6.63017 0.0331833L13.0517 10.8014L6.55569 14.6765L0.0518397 10.7353Z" fill="#222222"/>
 				<path d="M6.5497 15.8536L0.0458522 11.9124L6.52336 21.0329L13.0457 11.9785L6.5497 15.8536Z" fill="#222222"/>
 			</svg>
-			<p class="siwe-button-text">Sign-In with Ethereum</p>
+			<p class="siwe-button-text">Sign in with Ethereum</p>
 		</button>
 		<div class="terms-of-use-text">
 			By using this service you agree to the <a href="/legal/terms-of-use.pdf">Terms of Use</a> and
