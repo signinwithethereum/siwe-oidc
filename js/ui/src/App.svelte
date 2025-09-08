@@ -16,7 +16,7 @@
 	export let state: string;
 	export let oidc_nonce: string;
 	export let client_id: string;
-	const projectId: string = process.env.PROJECT_ID;
+	const projectId: string = 'ed39855b9f2f5f1c20a0a8d15229b1cc';
 
 	$: status = 'Not Logged In';
 
@@ -119,7 +119,7 @@
 		<div class="welcome-container">
 			<h4 class="welcome-title">Welcome</h4>
 			<span class="welcome-text">
-				Sign-In with Ethereum to continue to {client_metadata.client_name ? client_metadata.client_name : domain}
+				Sign in with Ethereum to continue to {client_metadata.client_name ? client_metadata.client_name : domain}
 			</span>
 		</div>
 
@@ -135,10 +135,10 @@
 			</svg>
 			<p class="siwe-button-text">Sign in with Ethereum</p>
 		</button>
-		<div class="terms-of-use-text">
+		<!-- <div class="terms-of-use-text">
 			By using this service you agree to the <a href="/legal/terms-of-use.pdf">Terms of Use</a> and
 			<a href="/legal/privacy-policy.pdf">Privacy Policy</a>.
-		</div>
+		</div> -->
 
 		{#if client_metadata.client_uri}
 			<span class="request-linked-text">Request linked to {client_metadata.client_uri}</span>

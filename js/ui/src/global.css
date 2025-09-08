@@ -5,19 +5,18 @@
 }
 
 :root {
-	--background: #222222;
-	--foreground: #ffffff;
+	--background: #dddddd;
+	--foreground: #000000;
 	--accent: #00eaf2;
-	--muted: #333333;
-	--border: #1f2937;
+	--muted: #ffffff;
+	--border: #aaaaaa;
 }
 
 body {
 	color: var(--foreground);
 	background-color: var(--background);
 	box-sizing: border-box;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-		Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+	font-family: 'Inter', sans-serif;
 }
 
 .page-container {
@@ -36,7 +35,6 @@ body {
 	max-width: 360px;
 	background-color: var(--muted);
 	border-radius: 12px;
-	box-shadow: 0 0 32px 0 rgba(0, 190, 204, 0.5);
 	padding: 32px;
 }
 
@@ -44,7 +42,7 @@ body {
 	width: 72px;
 	height: 72px;
 	border-radius: 12px;
-	margin-bottom: 16px;
+	margin-bottom: 4px;
 }
 
 .welcome-container {
@@ -68,12 +66,14 @@ body {
 }
 
 .siwe-button {
-	background-color: var(--accent);
-	border-radius: 12px;
-	padding: 14px 24px;
+	border: 2px solid var(--border);
+	background-color: transparent;
+	border-radius: 4px;
+	padding: 14px 32px;
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	outline: none;
+	gap: 10px;
 	cursor: pointer;
 	font-size: 16px;
 	font-weight: 600;
@@ -82,6 +82,7 @@ body {
 
 .siwe-button:hover {
 	opacity: 0.8;
+	background-color: #eeeeee;
 }
 
 .siwe-button:active {
