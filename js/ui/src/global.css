@@ -1,63 +1,112 @@
-html, body {
-	position: relative;
-	width: 100%;
-	height: 100%;
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+:root {
+	--background: #222222;
+	--foreground: #ffffff;
+	--accent: #00eaf2;
+	--muted: #333333;
+	--border: #1f2937;
 }
 
 body {
-	color: #333;
-	margin: 0;
-	padding: 8px;
+	color: var(--foreground);
+	background-color: var(--background);
 	box-sizing: border-box;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+.page-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+.siwe-card {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	align-items: center;
+	justify-content: center;
+	max-width: 360px;
+	background-color: var(--muted);
+	border-radius: 12px;
+	box-shadow: 0 0 32px 0 rgba(0, 190, 204, 0.5);
+	padding: 32px;
+}
+
+.page-logo {
+	width: 72px;
+	height: 72px;
+	border-radius: 12px;
+	margin-bottom: 16px;
+}
+
+.welcome-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	margin: 8px 0;
+}
+
+.welcome-title {
+	font-size: 26px;
+	font-weight: 600;
+}
+
+.welcome-text {
+	font-size: 14px;
+	font-weight: 400;
+}
+
+.siwe-button {
+	background-color: var(--accent);
+	border-radius: 12px;
+	padding: 14px 24px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.siwe-button:hover {
+	opacity: 0.8;
+}
+
+.siwe-button:active {
+	transform: scale(0.98);
+}
+
+.terms-of-use-text {
+	font-size: 12px;
+	font-weight: 400;
+	margin-top: 24px;
+	text-align: center;
+	color: #aaaaaa;
+}
+
+.request-linked-text {
+	font-size: 14px;
+	font-weight: 400;
+	margin-top: 16px;
+	text-align: center;
 }
 
 a {
-	color: rgb(0,100,200);
+	color: var(--accent);
 	text-decoration: none;
 }
 
 a:hover {
 	text-decoration: underline;
-}
-
-a:visited {
-	color: rgb(0,80,160);
-}
-
-label {
-	display: block;
-}
-
-input, button, select, textarea {
-	font-family: inherit;
-	font-size: inherit;
-	-webkit-padding: 0.4em 0;
-	padding: 0.4em;
-	margin: 0 0 0.5em 0;
-	box-sizing: border-box;
-	border: 1px solid #ccc;
-	border-radius: 2px;
-}
-
-input:disabled {
-	color: #ccc;
-}
-
-button {
-	color: #333;
-	background-color: #f4f4f4;
-	outline: none;
-}
-
-button:disabled {
-	color: #999;
-}
-
-button:not(:disabled):active {
-	background-color: #ddd;
-}
-
-button:focus {
-	border-color: #666;
 }

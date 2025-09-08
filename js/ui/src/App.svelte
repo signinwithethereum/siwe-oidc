@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	
-	
 	import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi'
 
 	import { arbitrum, mainnet, polygon } from '@wagmi/core/chains';
-	import { getAccount, signMessage, reconnect, getConnections} from '@wagmi/core';
+	import { getAccount, signMessage, reconnect } from '@wagmi/core';
 	import { SiweMessage } from 'siwe';
 	import Cookies from 'js-cookie';
 
@@ -41,6 +40,10 @@
 	reconnect(config)
 
 	let client_metadata = {};
+	let oidc_nonce_param = '';
+	if (oidc_nonce != null && oidc_nonce != '') {
+		oidc_nonce_param = `&oidc_nonce=${oidc_nonce}`;
+	}
 	onMount(async () => {
 		try {
 			client_metadata = fetch(`${window.location.origin}/client/${client_id}`).then((response) => response.json());
@@ -49,8 +52,7 @@
 		}
 	});
 
-	web3modal.subscribeState(async (newState) => {
-
+	web3modal.subscribeState(async () => {
 		const account = getAccount(config);
 
 		if (account.isConnected) {
@@ -76,6 +78,7 @@
 				await new Promise((resolve) => setTimeout(resolve, 1000));
 				
 				const signature = await signMessage(config,{
+					account: account.address,
 					message: preparedMessage,
 				});
 
@@ -99,218 +102,46 @@
 			}
 		}
 	});
-
-	let oidc_nonce_param = '';
-	if (oidc_nonce != null && oidc_nonce != '') {
-		oidc_nonce_param = `&oidc_nonce=${oidc_nonce}`;
-	}
 </script>
 
-<div
-	class="bg-no-repeat bg-cover bg-center bg-swe-landing font-satoshi bg-gray flex-grow w-full h-screen items-center flex justify-center flex-wrap flex-col"
+<main
+	class="page-container"
 >
-	<div class="w-96 text-center bg-white rounded-20 text-grey flex h-100 flex-col p-12 shadow-lg shadow-white">
+	<div class="siwe-card">
 		{#if client_metadata.logo_uri}
 			<div class="flex justify-evenly items-stretch">
-				<img height="72" width="72" class="self-center mb-8" src="img/siwe.svg" alt="SIWE logo" />
-				<img height="72" width="72" class="self-center mb-8" src={client_metadata.logo_uri} alt="Client logo" />
+				<img height="72" width="72" class="page-logo" src="img/siwe.svg" alt="SIWE logo" />
+				<img height="72" width="72" class="page-logo" src={client_metadata.logo_uri} alt="Client logo" />
 			</div>
 		{:else}
-			<img height="72" width="72" class="self-center mb-8" src="img/siwe.svg" alt="SIWE logo" />
+			<img height="72" width="72" class="page-logo" src="img/siwe.svg" alt="SIWE logo" />
 		{/if}
-		<h5>Welcome</h5>
-		<span class="text-xs">
-			Sign-In with Ethereum to continue to {client_metadata.client_name ? client_metadata.client_name : domain}
-		</span>
+		<div class="welcome-container">
+			<h4 class="welcome-title">Welcome</h4>
+			<span class="welcome-text">
+				Sign-In with Ethereum to continue to {client_metadata.client_name ? client_metadata.client_name : domain}
+			</span>
+		</div>
 
 		<button
-			class="h-12 border hover:scale-105 justify-evenly shadow-xl border-white mt-4 duration-100 ease-in-out transition-all transform flex items-center"
+			class="siwe-button"
 			on:click={() => {
 				web3modal.open();
 			}}
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				clip-rule="evenodd"
-				fill-rule="evenodd"
-				stroke-linejoin="round"
-				stroke-miterlimit="1.41421"
-				viewBox="170 30 220 350"
-				class="w-6 h-8"
-			>
-				<g fill-rule="nonzero" transform="matrix(.781253 0 0 .781253 180 37.1453)">
-					<path d="m127.961 0-2.795 9.5v275.668l2.795 2.79 127.962-75.638z" fill="#343434" /><path
-						d="m127.962 0-127.962 212.32 127.962 75.639v-133.801z"
-						fill="#8c8c8c"
-					/>
-					<path d="m127.961 312.187-1.575 1.92v98.199l1.575 4.601 128.038-180.32z" fill="#3c3c3b" /><path
-						d="m127.962 416.905v-104.72l-127.962-75.6z"
-						fill="#8c8c8c"
-					/>
-					<path d="m127.961 287.958 127.96-75.637-127.96-58.162z" fill="#141414" /><path
-						d="m.001 212.321 127.96 75.637v-133.799z"
-						fill="#393939"
-					/>
-				</g>
+			<svg width="14" height="22" viewBox="0 0 14 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path d="M0.0518397 10.7353L6.63017 0.0331833L13.0517 10.8014L6.55569 14.6765L0.0518397 10.7353Z" fill="#222222"/>
+				<path d="M6.5497 15.8536L0.0458522 11.9124L6.52336 21.0329L13.0457 11.9785L6.5497 15.8536Z" fill="#222222"/>
 			</svg>
-			<p class="font-bold">Sign-In with Ethereum</p>
+			<p class="siwe-button-text">Sign-In with Ethereum</p>
 		</button>
-		<div class="self-center mt-auto text-center font-semibold text-xs">
+		<div class="terms-of-use-text">
 			By using this service you agree to the <a href="/legal/terms-of-use.pdf">Terms of Use</a> and
 			<a href="/legal/privacy-policy.pdf">Privacy Policy</a>.
 		</div>
 
 		{#if client_metadata.client_uri}
-			<span class="text-xs mt-4">Request linked to {client_metadata.client_uri}</span>
+			<span class="request-linked-text">Request linked to {client_metadata.client_uri}</span>
 		{/if}
 	</div>
-</div>
-
-<style global lang="postcss">
-	@tailwind base;
-	@tailwind components;
-	@tailwind utilities;
-
-	.tooltip {
-		@apply invisible absolute;
-	}
-
-	.has-tooltip:hover .tooltip {
-		@apply visible z-50;
-	}
-	html,
-	body {
-		position: relative;
-		width: 100vw;
-		height: 100vh;
-		margin: 0px;
-		padding: 0px;
-		font-size: 18px;
-		background: #ecf2fe;
-		display: flex;
-		flex-direction: column;
-		overflow-x: hidden;
-		@apply font-satoshi;
-	}
-
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		@apply font-extrabold;
-		@apply font-satoshi;
-	}
-
-	h1 {
-		font-size: 76px;
-		line-height: 129px;
-		letter-spacing: -4.5%;
-	}
-
-	h2 {
-		font-size: 66px;
-		line-height: 101px;
-		letter-spacing: -3%;
-	}
-
-	h3 {
-		font-size: 52px;
-		line-height: 80px;
-		letter-spacing: -1.5%;
-	}
-
-	h4 {
-		font-size: 48px;
-		line-height: 63px;
-		letter-spacing: -1%;
-	}
-
-	h5 {
-		font-size: 32px;
-		line-height: 49px;
-		letter-spacing: -0.5%;
-	}
-
-	h6 {
-		font-size: 24px;
-		line-height: 37px;
-		letter-spacing: -0.5%;
-	}
-
-	body {
-		color: #222222;
-	}
-
-	a {
-		text-decoration: none;
-		color: #04d2ca;
-	}
-
-	td,
-	th {
-		font-family: 'Satoshi';
-		font-weight: 400;
-	}
-
-	pre {
-		white-space: pre-wrap; /* Since CSS 2.1 */
-		white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-		white-space: -pre-wrap; /* Opera 4-6 */
-		white-space: -o-pre-wrap; /* Opera 7 */
-		word-wrap: break-word; /* Internet Explorer 5.5+ */
-	}
-
-	.web3modal-modal-lightbox {
-		z-index: 30 !important;
-	}
-
-	.walletconnect-modal__base {
-		background-color: #273137 !important;
-	}
-
-	.walletconnect-qrcode__text {
-		color: white !important;
-	}
-
-	.walletconnect-modal__mobile__toggle {
-		background: rgba(255, 255, 255, 0.1) !important;
-	}
-
-	.walletconnect-qrcode__image {
-		border: 24px solid white !important;
-		border-radius: 8px !important;
-	}
-
-	.walletconnect-modal__base__row:hover {
-		background: rgba(255, 255, 255, 0.1) !important;
-	}
-
-	.walletconnect-modal__mobile__toggle_selector {
-		background: rgba(255, 255, 255, 0.2) !important;
-	}
-
-	/**
-	Custom scrollbar settings
-	*/
-	::-webkit-scrollbar-track {
-		border-radius: 8px;
-		background-color: #ccc;
-	}
-
-	::-webkit-scrollbar-thumb {
-		border-radius: 8px;
-		background-color: #888;
-	}
-	::-webkit-scrollbar {
-		height: 6px;
-		border-radius: 8px;
-		width: 6px;
-		background-color: #ccc;
-	}
-
-	.grecaptcha-badge {
-		visibility: hidden;
-	}
-</style>
+</main>
