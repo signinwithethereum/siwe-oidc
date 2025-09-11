@@ -117,10 +117,11 @@
 			<img height="72" width="72" class="page-logo" src="img/siwe.svg" alt="SIWE logo" />
 		{/if}
 		<div class="welcome-container">
-			<h4 class="welcome-title">Welcome</h4>
-			<span class="welcome-text">
-				Sign in with Ethereum to continue to {client_metadata.client_name ? client_metadata.client_name : domain}
-			</span>
+			<h4 class="welcome-title">Sign in with Ethereum</h4>
+			<p class="welcome-text">
+				Sign a message with your Ethereum wallet to continue to:
+			</p>
+			<p class="welcome-text-url">{client_metadata.client_name ? client_metadata.client_name : domain}</p>
 		</div>
 
 		<button
@@ -133,12 +134,8 @@
 				<path d="M0.0518397 10.7353L6.63017 0.0331833L13.0517 10.8014L6.55569 14.6765L0.0518397 10.7353Z" fill="#222222"/>
 				<path d="M6.5497 15.8536L0.0458522 11.9124L6.52336 21.0329L13.0457 11.9785L6.5497 15.8536Z" fill="#222222"/>
 			</svg>
-			<p class="siwe-button-text">Sign in with Ethereum</p>
+			<p class="siwe-button-text">Open your wallet</p>
 		</button>
-		<!-- <div class="terms-of-use-text">
-			By using this service you agree to the <a href="/legal/terms-of-use.pdf">Terms of Use</a> and
-			<a href="/legal/privacy-policy.pdf">Privacy Policy</a>.
-		</div> -->
 
 		{#if client_metadata.client_uri}
 			<span class="request-linked-text">Request linked to {client_metadata.client_uri}</span>
