@@ -1,8 +1,8 @@
-import './global.css';
+import './global.css'
 
-import App from './App.svelte';
+import App from './App.svelte'
 
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search)
 
 const app = new App({
 	target: document.body,
@@ -12,8 +12,8 @@ const app = new App({
 		redirect: params.get('redirect_uri'),
 		state: params.get('state'),
 		oidc_nonce: params.get('oidc_nonce'),
-		client_id: params.get('client_id')
-	}
-});
+		client_id: params.get('client_id'),
+	},
+})
 
-export default app;
+export default app
