@@ -35,6 +35,8 @@ function createSiweMessage(params: {
   chainId: number
   nonce: string
   statement?: string
+  expirationTime?: string
+  notBefore?: string
   resources?: string[]
 }): string {
   const lines = [
@@ -51,11 +53,19 @@ function createSiweMessage(params: {
     `Nonce: ${params.nonce}`,
     `Issued At: ${new Date().toISOString()}`,
   )
+  if (params.expirationTime)
+    lines.push(`Expiration Time: ${params.expirationTime}`)
+  if (params.notBefore) lines.push(`Not Before: ${params.notBefore}`)
   if (params.resources?.length) {
     lines.push('Resources:')
     for (const r of params.resources) lines.push(`- ${r}`)
   }
   return lines.join('\n')
+}
+
+/** Default expirationTime far enough out to satisfy any sane policy. */
+function defaultExpirationTime(): string {
+  return new Date(Date.now() + 60 * 1000).toISOString()
 }
 
 /** Hex-encode a UID for use as an EIP-4361 compliant nonce. */
@@ -134,6 +144,7 @@ describe.skipIf(!serverAvailable)('siwe-oidc', () => {
       chainId: 1,
       nonce: hexNonce(uid),
       statement: 'Sign-In with Ethereum',
+      expirationTime: defaultExpirationTime(),
       resources: ['https://example.com/callback'],
     })
     const signature = await account.signMessage({ message })
@@ -280,6 +291,7 @@ describe.skipIf(!serverAvailable)('siwe-oidc', () => {
         chainId: 1,
         nonce: hexNonce(uid),
         statement: 'Sign-In with Ethereum',
+        expirationTime: defaultExpirationTime(),
         resources: ['https://example.com/callback'],
       })
       const signature = await account.signMessage({ message })
@@ -411,6 +423,7 @@ describe.skipIf(!serverAvailable)('siwe-oidc', () => {
         uri: BASE,
         chainId: 1,
         nonce: hexNonce(uid),
+        expirationTime: defaultExpirationTime(),
         resources: ['https://example.com/callback'],
       })
       const badSig = '0x' + 'ab'.repeat(65) // garbage 65-byte signature
@@ -644,6 +657,7 @@ describe.skipIf(!serverAvailable)('siwe-oidc', () => {
         chainId: 1,
         nonce: hexNonce(uid),
         statement: 'Sign-In with Ethereum',
+        expirationTime: defaultExpirationTime(),
         resources: ['https://example.com/callback'],
       })
       const signature = await account.signMessage({ message })
@@ -703,6 +717,74 @@ describe.skipIf(!serverAvailable)('siwe-oidc', () => {
       expect(res.status).toBe(400)
       const body = await res.json()
       expect(body.statusMessage).toMatch(/resource does not match redirect_uri/)
+    })
+
+    it('rejects SIWE message missing Expiration Time when policy is set', async () => {
+      const { uid, cookies } = await startInteraction()
+
+      const message = createSiweMessage({
+        domain: new URL(BASE).host,
+        address: account.address,
+        uri: BASE,
+        chainId: 1,
+        nonce: hexNonce(uid),
+        statement: 'Sign-In with Ethereum',
+        resources: ['https://example.com/callback'],
+        // expirationTime intentionally omitted
+      })
+      const signature = await account.signMessage({ message })
+
+      const res = await fetch(apiUrl(`/api/interaction/${uid}`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', cookie: cookies },
+        body: JSON.stringify({ message, signature }),
+      })
+      expect(res.status).toBe(400)
+      const body = await res.json()
+      expect(body.statusMessage).toMatch(/Expiration Time/)
+    })
+
+    it('rejects SIWE message with Expiration Time past the configured maximum', async () => {
+      const { uid, cookies } = await startInteraction()
+
+      // Default policy is 600s + 60s grace; 7 days is well past.
+      const farFuture = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString()
+      const message = createSiweMessage({
+        domain: new URL(BASE).host,
+        address: account.address,
+        uri: BASE,
+        chainId: 1,
+        nonce: hexNonce(uid),
+        statement: 'Sign-In with Ethereum',
+        expirationTime: farFuture,
+        resources: ['https://example.com/callback'],
+      })
+      const signature = await account.signMessage({ message })
+
+      const res = await fetch(apiUrl(`/api/interaction/${uid}`), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', cookie: cookies },
+        body: JSON.stringify({ message, signature }),
+      })
+      expect(res.status).toBe(400)
+      const body = await res.json()
+      expect(body.statusMessage).toMatch(/exceeds configured maximum/)
+    })
+  })
+
+  describe('interaction details', () => {
+    it('exposes SIWE policy durations the client materialises at sign time', async () => {
+      const { uid, cookies } = await startInteraction()
+      const res = await fetch(apiUrl(`/api/interaction/${uid}`), {
+        headers: { cookie: cookies },
+      })
+      const details = await res.json()
+      expect(details.siwe).toBeDefined()
+      // Default policy: expirationTime=600 (seconds), notBefore disabled (null).
+      // Durations not ISO strings — see [uid].get.ts. The client computes
+      // fresh ISO timestamps at sign time so retries get a fresh window.
+      expect(details.siwe.expirationTimeSeconds).toBe(600)
+      expect(details.siwe.notBeforeToleranceSeconds).toBeNull()
     })
   })
 

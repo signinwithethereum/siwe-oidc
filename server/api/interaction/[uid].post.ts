@@ -4,6 +4,10 @@ import {
   SiweError,
   createViemConfig,
 } from '@signinwithethereum/siwe'
+import {
+  validateSiweTimestamps,
+  siweTimestampErrorMessage,
+} from '../../utils/siwe-times'
 
 export default defineEventHandler(async (event) => {
   const provider = await getProvider()
@@ -75,12 +79,27 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Enforce server-configured validity windows. The SIWE library's verify()
+  // rejects past expirationTime / future notBefore, but only when present —
+  // when the operator sets a policy we require the field and bound how far
+  // in the future it can be set.
+  const { oidc } = useRuntimeConfig()
+  const timestampError = validateSiweTimestamps(siweMessage, {
+    expirationTime: oidc.siweExpirationTime,
+    notBefore: oidc.siweNotBefore,
+  })
+  if (timestampError) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: siweTimestampErrorMessage(timestampError),
+    })
+  }
+
   // Verify signature + domain binding — supports EOA, EIP-1271 (contract
   // wallets like Safe), and EIP-6492 (pre-deployed ERC-4337 accounts).
   // verify() throws SiweError directly (4.1.0+) on failure.
   // The publicClient must target the SIWE message's chain so that EIP-1271
   // contract wallet signatures are verified on the correct network.
-  const { oidc } = useRuntimeConfig()
   const publicClient = createChainClient(oidc.ethProvider, siweMessage.chainId)
   const config = await createViemConfig({ publicClient })
 

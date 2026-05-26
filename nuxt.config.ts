@@ -33,6 +33,10 @@ export default defineNuxtConfig({
       ethProvider: '',
       defaultClients: '{}',
       cookieKeys: '',
+      // SIWE message validity window. Seconds from issuance.
+      // 0 disables — message omits the corresponding field.
+      siweExpirationTime: 600,
+      siweNotBefore: 0,
     },
   },
 })

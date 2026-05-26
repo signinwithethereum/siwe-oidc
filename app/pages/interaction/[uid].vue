@@ -73,6 +73,8 @@ const { data, error } = await useFetch(`/api/interaction/${uid}`, {
           :nonce="data.nonce"
           :client-id="data.params?.client_id"
           :redirect-uri="data.params?.redirect_uri"
+          :expiration-time-seconds="data.siwe?.expirationTimeSeconds"
+          :not-before-tolerance-seconds="data.siwe?.notBeforeToleranceSeconds"
         />
       </template>
     </CardPage>

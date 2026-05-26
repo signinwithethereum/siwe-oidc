@@ -71,17 +71,41 @@ This starts both the provider and a Redis instance.
 
 All configuration is via environment variables (see `.env.example`):
 
-| Variable                                    | Description                              | Default                  |
-| ------------------------------------------- | ---------------------------------------- | ------------------------ |
-| `NUXT_OIDC_BASE_URL`                        | Issuer URL                               | `http://localhost:3000`  |
-| `NUXT_OIDC_REDIS_URL`                       | Redis connection URL                     | `redis://localhost:6379` |
-| `NUXT_OIDC_COOKIE_KEYS`                     | Cookie signing keys (comma-separated)    | _required_               |
-| `NUXT_OIDC_RSA_PEM`                         | RSA private key in PEM format            | auto-generated           |
-| `NUXT_OIDC_REQUIRE_SECRET`                  | Require client secret for token exchange | `true`                   |
-| `NUXT_OIDC_ETH_PROVIDER`                    | Ethereum RPC URL for ENS resolution      | public default           |
-| `NUXT_OIDC_DEFAULT_CLIENTS`                 | Pre-configured clients (JSON)            | `{}`                     |
-| `NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID` | WalletConnect project ID                 | —                        |
-| `NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS`       | Ethereum mainnet RPC URLs                | —                        |
+| Variable                                    | Description                                                    | Default                  |
+| ------------------------------------------- | -------------------------------------------------------------- | ------------------------ |
+| `NUXT_OIDC_BASE_URL`                        | Issuer URL                                                     | `http://localhost:3000`  |
+| `NUXT_OIDC_REDIS_URL`                       | Redis connection URL                                           | `redis://localhost:6379` |
+| `NUXT_OIDC_COOKIE_KEYS`                     | Cookie signing keys (comma-separated)                          | _required_               |
+| `NUXT_OIDC_RSA_PEM`                         | RSA private key in PEM format                                  | auto-generated           |
+| `NUXT_OIDC_REQUIRE_SECRET`                  | Require client secret for token exchange                       | `true`                   |
+| `NUXT_OIDC_ETH_PROVIDER`                    | Ethereum RPC URL for ENS resolution                            | public default           |
+| `NUXT_OIDC_DEFAULT_CLIENTS`                 | Pre-configured clients (JSON)                                  | `{}`                     |
+| `NUXT_OIDC_SIWE_EXPIRATION_TIME`            | SIWE Expiration Time policy (seconds, `0`=off)                 | `600`                    |
+| `NUXT_OIDC_SIWE_NOT_BEFORE`                 | SIWE Not Before tolerance (seconds, `0`=off)                   | `0`                      |
+| `NUXT_PUBLIC_EVM_WALLET_CONNECT_PROJECT_ID` | WalletConnect project ID                                       | —                        |
+| `NUXT_PUBLIC_EVM_CHAINS_MAINNET_RPCS`       | Ethereum mainnet RPC URLs                                      | —                        |
+
+### SIWE message validity window
+
+The server tells the client (in the interaction GET response) how many
+seconds of validity to bake into the signed SIWE message, and then enforces
+the policy on POST.
+
+- `NUXT_OIDC_SIWE_EXPIRATION_TIME` — when non-zero, the signed message must
+  include `Expiration Time`. The server rejects login if the field is
+  missing or set further than `EXPIRATION_TIME + 60s` (clock-skew grace)
+  past the verification time. The SIWE library separately rejects already
+  expired messages. The client computes `Expiration Time = now + N` at sign
+  time, so retries after an expired window get a fresh value.
+- `NUXT_OIDC_SIWE_NOT_BEFORE` — when non-zero, the signed message must
+  include `Not Before`. The client emits `Not Before = now` (immediate
+  validity); the server rejects values more than `NOT_BEFORE + 60s` past
+  the verification time. This is a *tolerance* — it bounds how far in the
+  future a tampered or misconfigured client can push the field. Setting it
+  does **not** delay sign-in by N seconds.
+
+Set either to `0` to disable enforcement and omit the corresponding field
+from the message the client signs.
 
 ### Default clients
 
